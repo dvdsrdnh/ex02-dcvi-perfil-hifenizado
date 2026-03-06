@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Perfil RGB Flicker - Raw Mosh Fixed</title>
+    <title>Perfil RGB Flicker - Color Fixed</title>
     <style>
         @keyframes flicker {
             0%   { background-color: #00FF00; color: #0000FF; }
@@ -40,38 +40,38 @@
             justify-content: center;
             align-items: center;
             animation: raw-mosh 0.5s infinite steps(2);
-            will-change: transform, clip-path;
         }
 
         .img-fundo {
             position: absolute;
-            width: 1440px;
+            width: 1200px;
             height: auto;
-            max-height: 45vh; /* Ajustado para dar espaço ao texto */
+            max-height: 50vh;
             object-fit: contain;
             z-index: 5;
-            /* REMOVIDO grayscale e mix-blend para manter cor original */
-            filter: contrast(180%) brightness(110%); 
+            /* Contraste moderado para não perder a cor */
+            filter: contrast(130%) brightness(110%); 
             image-rendering: pixelated;
-            opacity: 1; /* Aumentado para cor mais viva */
-            pointer-events: none;
+            opacity: 1;
             display: block; 
+            /* Isolamento para o mix-blend-mode do texto não a "limpar" */
+            isolation: isolate; 
         }
 
         #texto {
             text-align: center;
             font-size: 68px;
-            font-weight: 900; /* Força o peso da letra se for isso que queres */
+            font-weight: 900;
             z-index: 100;
-            /* LINE-HEIGHT FORÇADO */
             line-height: 0.8 !important; 
             padding: 40px;
+            /* O texto inverte em relação ao fundo colorido, mas isolamos a imagem */
             mix-blend-mode: exclusion;
             pointer-events: none;
             text-transform: lowercase;
             margin: 0;
             word-break: break-word;
-            letter-spacing: -2px; /* Aperta também as letras lateralmente */
+            letter-spacing: -2px;
         }
 
         .resting .mosh-zone {
@@ -95,7 +95,6 @@
     <script>
         const original = "(sou um) designer-anti-disciplinado-pornstar-in-training-inspirado-pela-cultura-pop-e-digital-a-pendular-entre-editorial-e-web";
         const glitches = ["U:r.", "ロ＜口", "㗊", "V3", "@", "RG", "O一个", "口", "^ロ4ロ", "S uFLIX", "©7Y", "QP3", "in;00Ld", "أعان ٦K", "IP", "Fö CHESt", "XXX", "??", "㗊", "---"];
-
         const el = document.getElementById('texto');
         const body = document.body;
         let contaminationLevel = 0;
@@ -106,31 +105,21 @@
             let display = original.split('').map(char => {
                 if (char === "-" || char === " " || char === "(" || char === ")") return char;
                 let threshold = state === "RESTING" ? 0.002 : contaminationLevel;
-                if (Math.random() < threshold) {
-                    return glitches[Math.floor(Math.random() * glitches.length)];
-                }
+                if (Math.random() < threshold) return glitches[Math.floor(Math.random() * glitches.length)];
                 return char;
             }).join('');
-
             el.innerHTML = display;
 
             if (state === "RESTING") {
                 body.classList.add('resting');
                 restTimer++;
-                if (restTimer > 20) { 
-                    state = "CONTAMINATING";
-                    body.classList.remove('resting');
-                    restTimer = 0;
-                }
+                if (restTimer > 20) { state = "CONTAMINATING"; body.classList.remove('resting'); restTimer = 0; }
             } else if (state === "CONTAMINATING") {
                 contaminationLevel += 0.06;
                 if (contaminationLevel >= 0.4) state = "CLEANING";
             } else if (state === "CLEANING") {
                 contaminationLevel -= 0.1;
-                if (contaminationLevel <= 0) {
-                    contaminationLevel = 0;
-                    state = "RESTING";
-                }
+                if (contaminationLevel <= 0) { contaminationLevel = 0; state = "RESTING"; }
             }
         }
         setInterval(update, 150);
