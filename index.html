@@ -2,9 +2,8 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Perfil RGB Flicker - Raw Mosh Ghost Image</title>
+    <title>Perfil RGB Flicker - Raw Mosh Fixed</title>
     <style>
-        /* Flicker de fundo: Intervalo mais curto para maior agressividade */
         @keyframes flicker {
             0%   { background-color: #00FF00; color: #0000FF; }
             33%  { background-color: #0000FF; color: #FF0000; }
@@ -12,28 +11,12 @@
             100% { background-color: #00FF00; color: #0000FF; }
         }
 
-        /* MOSH CRU: Movimentos ortogonais secos e cortes de buffer */
         @keyframes raw-mosh {
-            0%, 100% { 
-                transform: translate(0, 0) scale(1);
-                clip-path: inset(0 0 0 0); 
-            }
-            25% { 
-                transform: translate(-20vw, 15vh) scale(1.5, 1); 
-                clip-path: inset(10% 0 85% 0);
-            }
-            50% { 
-                transform: translate(30vw, -10vh) scale(0.2, 2);
-                clip-path: inset(0 0 0 0);
-            }
-            75% { 
-                transform: translate(-10vw, 0) scale(1, 4); 
-                clip-path: inset(45% 0 45% 0);
-            }
-            90% { 
-                transform: translate(0, 40vh);
-                clip-path: inset(0 10% 0 10%);
-            }
+            0%, 100% { transform: translate(0, 0) scale(1); clip-path: inset(0 0 0 0); }
+            25% { transform: translate(-20vw, 15vh) scale(1.5, 1); clip-path: inset(10% 0 85% 0); }
+            50% { transform: translate(30vw, -10vh) scale(0.2, 2); clip-path: inset(0 0 0 0); }
+            75% { transform: translate(-10vw, 0) scale(1, 4); clip-path: inset(45% 0 45% 0); }
+            90% { transform: translate(0, 40vh); clip-path: inset(0 10% 0 10%); }
         }
 
         body {
@@ -64,34 +47,33 @@
             position: absolute;
             width: 1440px;
             height: auto;
-            max-height: 40vh;
+            max-height: 45vh; /* Ajustado para dar espaço ao texto */
             object-fit: contain;
             z-index: 5;
-            filter: contrast(250%) brightness(120%);
+            /* REMOVIDO grayscale e mix-blend para manter cor original */
+            filter: contrast(180%) brightness(110%); 
             image-rendering: pixelated;
-            opacity: 0.95;
+            opacity: 1; /* Aumentado para cor mais viva */
             pointer-events: none;
-            /* A imagem começa visível por padrão na mosh-zone */
             display: block; 
         }
 
         #texto {
             text-align: center;
             font-size: 68px;
-            font-weight: normal;
+            font-weight: 900; /* Força o peso da letra se for isso que queres */
             z-index: 100;
-            line-height: 0.95;
+            /* LINE-HEIGHT FORÇADO */
+            line-height: 0.8 !important; 
             padding: 40px;
             mix-blend-mode: exclusion;
             pointer-events: none;
             text-transform: lowercase;
             margin: 0;
             word-break: break-word;
+            letter-spacing: -2px; /* Aperta também as letras lateralmente */
         }
 
-        /* --- LÓGICA DE APARIÇÃO DA IMAGEM --- */
-
-        /* Quando em descanso: esconde a mosh-zone e a imagem */
         .resting .mosh-zone {
             animation: none !important;
             transform: none !important;
@@ -99,9 +81,8 @@
         }
 
         .resting .img-fundo {
-            display: none; /* A imagem desaparece totalmente no repouso */
+            display: none; 
         }
-
     </style>
 </head>
 <body> 
@@ -136,7 +117,6 @@
             if (state === "RESTING") {
                 body.classList.add('resting');
                 restTimer++;
-                // 20 iterações * 150ms = ~3 segundos de "limpeza"
                 if (restTimer > 20) { 
                     state = "CONTAMINATING";
                     body.classList.remove('resting');
@@ -153,7 +133,6 @@
                 }
             }
         }
-
         setInterval(update, 150);
     </script>
 </body>
