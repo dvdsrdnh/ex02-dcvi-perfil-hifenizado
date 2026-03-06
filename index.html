@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Perfil RGB Flicker - Raw Mosh Ghost Image</title>
+    <title>Perfil RGB Flicker - Ultra Raw Mosh</title>
     <style>
         /* Flicker de fundo: Intervalo mais curto para maior agressividade */
         @keyframes flicker {
@@ -62,16 +62,15 @@
 
         .img-fundo {
             position: absolute;
-            width: 1440px;
+            width: 900px;
             height: auto;
-            max-height: 40vh;
+            max-height: 60vh;
             object-fit: contain;
             z-index: 5;
-            filter: contrast(250%) brightness(120%);
+            filter: contrast(300%) brightness(120%) grayscale(1);
             image-rendering: pixelated;
             opacity: 0.95;
             pointer-events: none;
-            /* A imagem começa visível por padrão na mosh-zone */
             display: block; 
         }
 
@@ -80,7 +79,7 @@
             font-size: 68px;
             font-weight: normal;
             z-index: 100;
-            line-height: 0.95;
+            line-height: 0.85;
             padding: 40px;
             mix-blend-mode: exclusion;
             pointer-events: none;
@@ -90,8 +89,6 @@
         }
 
         /* --- LÓGICA DE APARIÇÃO DA IMAGEM --- */
-
-        /* Quando em descanso: esconde a mosh-zone e a imagem */
         .resting .mosh-zone {
             animation: none !important;
             transform: none !important;
@@ -99,7 +96,7 @@
         }
 
         .resting .img-fundo {
-            display: none; /* A imagem desaparece totalmente no repouso */
+            display: none; 
         }
 
     </style>
@@ -107,7 +104,7 @@
 <body> 
 
     <div class="mosh-zone">
-        <img src="003.png" class="img-fundo" alt="Background">
+        <img src="003.png" class="img-fundo" alt="Background Performance">
         <p id="texto"></p>
     </div>
 
@@ -136,7 +133,6 @@
             if (state === "RESTING") {
                 body.classList.add('resting');
                 restTimer++;
-                // 20 iterações * 150ms = ~3 segundos de "limpeza"
                 if (restTimer > 20) { 
                     state = "CONTAMINATING";
                     body.classList.remove('resting');
