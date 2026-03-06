@@ -72,9 +72,8 @@
     image-rendering: pixelated;
     opacity: 1;
     /* GARANTE QUE NÃO HÁ FILTROS QUE POSSAM TIRAR COR */
-    filter: none !important; 
     /* ISOLA A IMAGEM DE MISTURAS DE COR EXTERNAS */
-    isolation: isolate; 
+   
 }
         #texto {
             text-align: center;
@@ -83,7 +82,7 @@
             z-index: 100;
             line-height: 1;
             padding: 40px;
-            mix-blend-mode: exclusion;
+            mix-blend-mode: multiply;
             pointer-events: none;
             text-transform: lowercase;
             margin: 0;
