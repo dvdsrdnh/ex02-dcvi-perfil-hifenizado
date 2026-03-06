@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Perfil RGB Flicker - Color Fixed</title>
+    <title>Perfil RGB Flicker - Final Color Fix</title>
     <style>
         @keyframes flicker {
             0%   { background-color: #00FF00; color: #0000FF; }
@@ -13,10 +13,10 @@
 
         @keyframes raw-mosh {
             0%, 100% { transform: translate(0, 0) scale(1); clip-path: inset(0 0 0 0); }
-            25% { transform: translate(-20vw, 15vh) scale(1.5, 1); clip-path: inset(10% 0 85% 0); }
-            50% { transform: translate(30vw, -10vh) scale(0.2, 2); clip-path: inset(0 0 0 0); }
-            75% { transform: translate(-10vw, 0) scale(1, 4); clip-path: inset(45% 0 45% 0); }
-            90% { transform: translate(0, 40vh); clip-path: inset(0 10% 0 10%); }
+            20% { transform: translate(-15vw, 10vh) scale(1.2, 1); clip-path: inset(20% 0 50% 0); }
+            40% { transform: translate(20vw, -5vh) scale(0.5, 2); }
+            60% { transform: translate(-5vw, 15vh) scale(2, 0.2); clip-path: inset(40% 0 40% 0); }
+            80% { transform: translate(10vw, -10vh) scale(1.5); }
         }
 
         body {
@@ -32,6 +32,7 @@
             background-color: #000;
         }
 
+        /* Camada 1: A Imagem que sofre o glitch (SEM MIX-BLEND) */
         .mosh-zone {
             position: absolute;
             width: 100%;
@@ -39,81 +40,82 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: raw-mosh 0.5s infinite steps(2);
+            animation: raw-mosh 0.4s infinite steps(2);
+            z-index: 5;
         }
 
         .img-fundo {
-            position: absolute;
             width: 1200px;
             height: auto;
             max-height: 50vh;
             object-fit: contain;
-            z-index: 5;
-            /* Contraste moderado para não perder a cor */
-            filter: contrast(130%) brightness(110%); 
+            /* Filtros mínimos para não destruir a cor */
+            filter: saturate(1.5) contrast(120%); 
             image-rendering: pixelated;
             opacity: 1;
-            display: block; 
-            /* Isolamento para o mix-blend-mode do texto não a "limpar" */
-            isolation: isolate; 
+        }
+
+        /* Camada 2: O Texto (FIXO, por cima de tudo) */
+        .overlay-texto {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            pointer-events: none;
         }
 
         #texto {
             text-align: center;
             font-size: 68px;
             font-weight: 900;
-            z-index: 100;
             line-height: 0.8 !important; 
             padding: 40px;
-            /* O texto inverte em relação ao fundo colorido, mas isolamos a imagem */
-            mix-blend-mode: exclusion;
-            pointer-events: none;
+            mix-blend-mode: exclusion; /* Inverte apenas com o fundo flicker */
             text-transform: lowercase;
             margin: 0;
-            word-break: break-word;
             letter-spacing: -2px;
+            color: #fff; /* Base branca para a exclusão funcionar bem */
         }
 
-        .resting .mosh-zone {
-            animation: none !important;
-            transform: none !important;
-            clip-path: none !important;
-        }
-
-        .resting .img-fundo {
-            display: none; 
-        }
+        /* Controlo de Repouso */
+        .resting .mosh-zone { display: none; }
     </style>
 </head>
 <body> 
 
     <div class="mosh-zone">
         <img src="imagens/003.png" class="img-fundo" alt="Background">
+    </div>
+
+    <div class="overlay-texto">
         <p id="texto"></p>
     </div>
 
     <script>
         const original = "(sou um) designer-anti-disciplinado-pornstar-in-training-inspirado-pela-cultura-pop-e-digital-a-pendular-entre-editorial-e-web";
-        const glitches = ["U:r.", "ロ＜口", "㗊", "V3", "@", "RG", "O一个", "口", "^ロ4ロ", "S uFLIX", "©7Y", "QP3", "in;00Ld", "أعان ٦K", "IP", "Fö CHESt", "XXX", "??", "㗊", "---"];
+        const glitches = ["U:r.", "ロ＜口", "㗊", "V3", "@", "RG", "O一个", "口", "^ロ4ロ", "S uFLIX", "©7Y", "QP3", "in;00Ld", "أعان ٦K", "IP", "Fö CHESt", "XXX", "??"];
         const el = document.getElementById('texto');
         const body = document.body;
-        let contaminationLevel = 0;
         let state = "RESTING"; 
         let restTimer = 0;
+        let contaminationLevel = 0;
 
         function update() {
             let display = original.split('').map(char => {
-                if (char === "-" || char === " " || char === "(" || char === ")") return char;
+                if ("- ()".includes(char)) return char;
                 let threshold = state === "RESTING" ? 0.002 : contaminationLevel;
-                if (Math.random() < threshold) return glitches[Math.floor(Math.random() * glitches.length)];
-                return char;
+                return Math.random() < threshold ? glitches[Math.floor(Math.random() * glitches.length)] : char;
             }).join('');
             el.innerHTML = display;
 
             if (state === "RESTING") {
                 body.classList.add('resting');
-                restTimer++;
-                if (restTimer > 20) { state = "CONTAMINATING"; body.classList.remove('resting'); restTimer = 0; }
+                if (++restTimer > 20) { state = "CONTAMINATING"; body.classList.remove('resting'); restTimer = 0; }
             } else if (state === "CONTAMINATING") {
                 contaminationLevel += 0.06;
                 if (contaminationLevel >= 0.4) state = "CLEANING";
